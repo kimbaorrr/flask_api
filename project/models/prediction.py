@@ -5,14 +5,14 @@ import re
 import numpy as np
 import json
 from base64 import b64encode
-import tensorflow as tf
 from project.models.custom_metrics import iou_score, f1_score
 from keras.src.saving import load_model, custom_object_scope
 import cv2 as cv
-import matplotlib.pyplot as plt
 from project.models.log_error import pred_error, system_error
 import logging
 import gc
+from PIL import Image as pil
+
 logging.basicConfig(filename='flask_api.log',
                     level=logging.ERROR,
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -80,10 +80,12 @@ def images_preprocessing(images, img_size):
     """
     new_images = []
     for image in images:
-        image = tf.image.resize(image, img_size).numpy()
+        image = image.resize((img_size))
+        image = image.convert('RGB')
+        image = np.array(image)
         new_images.append(image)
     new_images = np.asarray(new_images, dtype=np.uint8)
-    new_images = new_images / np.max(new_images)
+    new_images = new_images / 255.
     if new_images.ndim == 3:
         new_images = np.expand_dims(new_images, axis=0)
         return new_images
@@ -149,20 +151,20 @@ def chest_xray(files):
         custom_objects = {"iou_score": iou_score, "f1_score": f1_score}
         with custom_object_scope(custom_objects):
             model = load_model(os.path.join(model_path, 'best_model.keras'))
-        images = [plt.imread(file) for file in files]
+        images = [pil.open(file) for file in files]
         images = images_preprocessing(images, img_size)
         mask_results, cls_results = model.predict(images)
         for mask, cls in zip(mask_results, cls_results):
             mask_to_show = np.zeros(shape=(*img_size, 3), dtype=np.uint8)
-            mask_to_show[..., 0] = 0 # R
-            mask_to_show[..., 1] = (mask.squeeze() * 255).astype(np.uint8) # G
-            mask_to_show[..., 2] = 255 # B
+            mask_to_show[..., 0] = 0  # R
+            mask_to_show[..., 1] = mask.squeeze() * 255  # G
+            mask_to_show[..., 2] = 255  # B
             top_label = classes[(cls >= .5).astype(int)[0]]
             bad_label = classes[(cls < .5).astype(int)[0]]
             top_acc = round(float(cls[0]), 3)
             bad_acc = round(float(1 - cls[0]), 3)
-            _, buffer = cv.imencode('.png', mask_to_show) # RGB => BGR
-            mask_base64 = b64encode(buffer).decode('ascii')
+            _, buffer = cv.imencode('.png', mask_to_show)  # RGB => BGR
+            mask_base64 = b64encode(buffer).decode('utf-8')
             base64_to_show = f"data:image/png;base64,{mask_base64}"
             results_data.append({
                 'mask_base64': base64_to_show,
