@@ -1,0 +1,9 @@
+tensorflow==2.17
+keras==3.5.0
+matplotlib
+flask
+requests
+scikit-learn
+wfastcgi
+gensim
+opencv-contrib-python
