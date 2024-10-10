@@ -19,7 +19,7 @@ def get_du_an():
 def update_viewer():
     check_methods(['POST'])
     oid = str(request.form.get('id')).lower().strip()
-    DuAn().update_viewer(oid)
+    return DuAn().update_viewer(oid)
 
 # Tien Ich
 @app.route('/my_blog/tien_ich/get', methods=['GET'], endpoint=str(rd.getrandbits(128)))
@@ -51,4 +51,4 @@ def send():
         'email': email,
         'content': content
     }
-    AskQuestion().add(doc)  
+    return AskQuestion().add(doc)  
