@@ -7,3 +7,4 @@ scikit-learn
 wfastcgi
 gensim
 opencv-contrib-python
+pymongo
