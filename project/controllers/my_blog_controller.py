@@ -4,6 +4,7 @@ from project import app
 from project.models.log_error import constraint_error, method_error
 from project.models.my_blog import *
 from pyisemail import is_email
+from gensim.parsing.preprocessing import *
 
 def check_methods(methods=None):
     if request.method not in methods:
@@ -38,12 +39,18 @@ def get_ttcn():
 def send():
     check_methods(['POST'])
     name = str(request.form.get('name'))
+    if len(name) == 0:
+        return constraint_error('Tên không được để trống !')
     if len(name) > 50:
         return constraint_error('Tên không được vượt quá 50 kí tự !')
     email= str(request.form.get('email')).lower().strip()
+    if len(email) == 0:
+        return constraint_error('Email không được để trống !')
     if len(email) > 75 or not is_email(email, check_dns=True):
         return constraint_error('Email phải ít hơn 75 kí tự & phải là một tên miền hợp lệ !')
-    content = str(request.form.get('content'))
+    content = strip_multiple_whitespaces(str(request.form.get('content')))
+    if len(content) == 0:
+        return constraint_error('Nội dung không được để trống !')
     if len(content) > 255:
         return constraint_error('Nội dung không được vượt quá 255 kí tự !')
     doc = {

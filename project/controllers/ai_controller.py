@@ -21,6 +21,8 @@ def toxic_comments():
             input_text = str(request.args.get('text')).lower()
         case "POST":
             input_text = str(request.form.get('text')).lower()
+    if len(input_text) == 0:
+        return constraint_error('Chuỗi đầu vào không được để trống !')
     if len(input_text) > 255:
         return constraint_error('Chuỗi đầu vào không được vượt quá 255 kí tự !')    
     return pr.toxic_comments(input_text)
