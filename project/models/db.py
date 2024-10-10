@@ -4,7 +4,7 @@ import json
 
 def connect(db_name, db_collection_name):
     try:
-        with open('db_connection_string.json') as f:
+        with open('db_connection_string.json', 'r') as f:
             connection_string = json.load(f)
         hostname = connection_string['hostname']
         port = connection_string['port']
