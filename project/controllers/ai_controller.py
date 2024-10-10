@@ -2,7 +2,7 @@ import random as rd
 from flask import request
 from project import app
 import project.models.prediction as pr
-from project.models.log_error import method_error
+from project.models.log_error import constraint_error, method_error
 import gc
 
 
@@ -15,12 +15,14 @@ def check_methods(methods=None):
 def toxic_comments():
     gc.collect()
     check_methods(['GET', 'POST'])
-    input_text = str()
+    input_text = None
     match request.method:
         case "GET":
-            input_text = request.args.get('text')
+            input_text = str(request.args.get('text')).lower()
         case "POST":
-            input_text = request.form.get('text')
+            input_text = str(request.form.get('text')).lower()
+    if len(input_text) > 255:
+        constraint_error('Chuỗi đầu vào không được vượt quá 255 kí tự !')    
     return pr.toxic_comments(input_text)
 
 

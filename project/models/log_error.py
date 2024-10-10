@@ -3,7 +3,7 @@ import json
 
 
 @app.errorhandler(400)
-def pred_error(message):
+def constraint_error(message):
     return json.dumps({
         'code': 400,
         'message': message

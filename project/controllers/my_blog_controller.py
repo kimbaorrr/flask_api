@@ -1,12 +1,12 @@
 import random as rd
 from flask import request
 from project import app
-from project.models.log_error import method_error
-from project.models.my_blog import DuAn, TienIch, PersonalInfo
+from project.models.log_error import constraint_error, method_error
+from project.models.my_blog import *
 
 def check_methods(methods=None):
     if request.method not in methods:
-        return method_error()
+        return method_error
 
 # Du An
 @app.route('/my_blog/du_an/get', methods=['GET'], endpoint=str(rd.getrandbits(128)))
@@ -14,10 +14,10 @@ def get_du_an():
     check_methods(['GET'])
     return DuAn().get()
 
-@app.route('/my_blog/du_an/update_viewer', methods=['GET'], endpoint=str(rd.getrandbits(128)))
+@app.route('/my_blog/du_an/update_viewer', methods=['POST'], endpoint=str(rd.getrandbits(128)))
 def update_viewer():
-    check_methods(['GET'])
-    oid = request.args.get('id').lower().strip()
+    check_methods(['POST'])
+    oid = str(request.form.get('id')).lower().strip()
     DuAn().update_viewer(oid)
 
 # Tien Ich
@@ -31,3 +31,23 @@ def get_tien_ich():
 def get_ttcn():
     check_methods(['GET'])
     return PersonalInfo().get()
+
+# Ask Question
+@app.route('/my_blog/ask_question/send', methods=['POST'], endpoint=str(rd.getrandbits(128)))
+def send():
+    check_methods(['POST'])
+    name = str(request.form.get('name'))
+    if len(name) > 50:
+        constraint_error('Tên không được vượt quá 50 kí tự !')
+    email= str(request.form.get('email')).lower().strip()
+    if len(email) > 100 or '@' not in email:
+        constraint_error('Email phải ít hơn 100 kí tự & trong chuỗi phải chứa dấu @')
+    content = str(request.form.get('content'))
+    if len(content) > 255:
+        constraint_error('Nội dung không được vượt quá 255 kí tự !')
+    doc = {
+        'name': name,
+        'email': email,
+        'content': content
+    }
+    AskQuestion().add(doc)  
