@@ -8,7 +8,7 @@ from base64 import b64encode
 from project.models.custom_metrics import iou_score, f1_score
 from keras.src.saving import load_model, custom_object_scope
 import cv2 as cv
-from project.models.log_error import pred_error, system_error
+from project.models.log_error import constraint_error, system_error
 import logging
 import gc
 from PIL import Image as pil
@@ -57,12 +57,12 @@ def check_files(files):
         JSON: Có lỗi. Trả về kèm thông báo lỗi
     """
     if not files or len(files) == 0:
-        return pred_error('Bạn chưa upload bất kì tệp nào !')
+        return constraint_error('Bạn chưa upload bất kì tệp nào !')
     for file in files:
         if not file.filename.endswith(('.jpg', '.png', '.jpeg')):
-            return pred_error('Định dạng tệp không hỗ trợ !')
+            return constraint_error('Định dạng tệp không hỗ trợ !')
         if not file.content_type.startswith('image/'):
-            return pred_error('Nội dung tệp không phải là một ảnh !')
+            return constraint_error('Nội dung tệp không phải là một ảnh !')
     return None
 
 
