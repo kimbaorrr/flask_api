@@ -19,7 +19,7 @@ class DuAn():
     
     def update_viewer(self, oid):
         if not ObjectId.is_valid(oid):
-            constraint_error('ID không tồn tại !')
+            return constraint_error('ID không tồn tại !')
         update_operation = {'$inc': {'viewer': 1}}
         self.du_an_collection.update_one({'_id': ObjectId(oid)}, update_operation)
             

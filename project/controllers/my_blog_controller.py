@@ -3,6 +3,7 @@ from flask import request
 from project import app
 from project.models.log_error import constraint_error, method_error
 from project.models.my_blog import *
+from pyisemail import is_email
 
 def check_methods(methods=None):
     if request.method not in methods:
@@ -38,13 +39,13 @@ def send():
     check_methods(['POST'])
     name = str(request.form.get('name'))
     if len(name) > 50:
-        constraint_error('Tên không được vượt quá 50 kí tự !')
+        return constraint_error('Tên không được vượt quá 50 kí tự !')
     email= str(request.form.get('email')).lower().strip()
-    if len(email) > 100 or '@' not in email:
-        constraint_error('Email phải ít hơn 100 kí tự & trong chuỗi phải chứa dấu @')
+    if len(email) > 75 or not is_email(email, check_dns=True):
+        return constraint_error('Email phải ít hơn 75 kí tự & phải là một tên miền hợp lệ !')
     content = str(request.form.get('content'))
     if len(content) > 255:
-        constraint_error('Nội dung không được vượt quá 255 kí tự !')
+        return constraint_error('Nội dung không được vượt quá 255 kí tự !')
     doc = {
         'name': name,
         'email': email,

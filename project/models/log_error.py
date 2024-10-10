@@ -7,7 +7,7 @@ def constraint_error(message):
     return json.dumps({
         'code': 400,
         'message': message
-    }), 400
+    }, ensure_ascii=False), 400
 
 
 @app.errorhandler(405)
@@ -15,7 +15,7 @@ def method_error():
     return json.dumps({
         'code': 405,
         'message': 'Phương thức không được phép !'
-    }), 405
+    }, ensure_ascii=False), 405
 
 
 @app.errorhandler(500)
@@ -23,4 +23,4 @@ def system_error():
     return json.dumps({
         'code': 500,
         'message': 'Lỗi hệ thống. Thử lại !'
-    }), 500
+    }, ensure_ascii=False), 500

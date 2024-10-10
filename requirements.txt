@@ -8,3 +8,4 @@ wfastcgi
 gensim
 opencv-contrib-python
 pymongo
+pyisemail
