@@ -59,7 +59,7 @@ def check_files(files):
     if not files or len(files) == 0:
         return constraint_error('Bạn chưa upload bất kì tệp nào !')
     for file in files:
-        if not file.filename.endswith(('.jpg', '.png', '.jpeg')):
+        if not file.filename.endswith(('.jpg', '.png', '.jpeg', '.bmp', '.webp')):
             return constraint_error('Định dạng tệp không hỗ trợ !')
         if not file.content_type.startswith('image/'):
             return constraint_error('Nội dung tệp không phải là một ảnh !')
