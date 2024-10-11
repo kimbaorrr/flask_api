@@ -1,8 +1,7 @@
-import random as rd
 from flask import request
 from project import app
 import project.models.prediction as pr
-from project.models.log_error import constraint_error, method_error
+from project.models.error_handlers import constraint_error, method_error
 import gc
 
 
@@ -11,7 +10,7 @@ def check_methods(methods=None):
         return method_error()
 
 
-@app.route('/ai/toxic_comments', methods=['GET', 'POST'], endpoint=str(rd.getrandbits(128)))
+@app.route('/ai/toxic_comments', methods=['GET', 'POST'])
 def toxic_comments():
     gc.collect()
     check_methods(['GET', 'POST'])
@@ -28,7 +27,7 @@ def toxic_comments():
     return pr.toxic_comments(input_text)
 
 
-@app.route('/ai/chest_xray', methods=['POST'], endpoint=str(rd.getrandbits(128)))
+@app.route('/ai/chest_xray', methods=['POST'])
 def chest_xray():
     gc.collect()
     check_methods(['POST'])

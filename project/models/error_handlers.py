@@ -16,8 +16,7 @@ def method_error():
         'code': 405,
         'message': 'Phương thức không được phép !'
     }, ensure_ascii=False), 405
-
-
+    
 @app.errorhandler(500)
 def system_error():
     return json.dumps({

@@ -1,7 +1,7 @@
 import json
 from project.models.db import connect
 from bson.objectid import ObjectId
-from project.models.log_error import constraint_error, system_error
+from project.models.error_handlers import constraint_error, system_error
 import logging
 class DuAn():
     def __init__(self):
@@ -63,6 +63,7 @@ class AskQuestion():
     def add(self, doc):
         try:
             self.ask_collection.insert_one(doc)
+            return json.dumps({}), 200
         except Exception as e:
             logging.error(f"Error in my_blog.AskQuestion: {str(e)}", exc_info=True)
             return system_error()

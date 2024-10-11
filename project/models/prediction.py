@@ -8,7 +8,7 @@ from base64 import b64encode
 from project.models.custom_metrics import iou_score, f1_score
 from keras.src.saving import load_model, custom_object_scope
 import cv2 as cv
-from project.models.log_error import constraint_error, system_error
+from project.models.error_handlers import constraint_error, system_error
 import logging
 import gc
 from PIL import Image as pil
