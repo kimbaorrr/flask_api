@@ -1,35 +1,18 @@
 from flask import request
 from project import app
-import project.models.prediction as pr
-from project.models.error_handlers import constraint_error, method_error
-import gc
-
-
-def check_methods(methods=None):
-    if request.method not in methods:
-        return method_error()
-
+from project.models.ai import *
 
 @app.route('/ai/toxic_comments', methods=['GET', 'POST'])
-def toxic_comments():
-    gc.collect()
-    check_methods(['GET', 'POST'])
-    input_text = None
+def ai_toxic_comments():
     match request.method:
         case "GET":
-            input_text = str(request.args.get('text')).lower()
+            input_text = request.args.get('text')
         case "POST":
-            input_text = str(request.form.get('text')).lower()
-    if len(input_text) == 0:
-        return constraint_error('Chuỗi đầu vào không được để trống !')
-    if len(input_text) > 255:
-        return constraint_error('Chuỗi đầu vào không được vượt quá 255 kí tự !')    
-    return pr.toxic_comments(input_text)
+            input_text = request.form.get('text')
+    return ToxicComments(input_text).run()
 
 
 @app.route('/ai/chest_xray', methods=['POST'])
-def chest_xray():
-    gc.collect()
-    check_methods(['POST'])
+def ai_chest_xray():
     files = request.files.getlist('file')
-    return pr.chest_xray(files)
+    return ChestXray(files).run()
