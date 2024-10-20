@@ -11,19 +11,46 @@ logging.basicConfig(filename='flask_api.log',
                     level=logging.ERROR,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
+
 class DuAn():
     def __init__(self):
         self.du_an_collection = connect('my_blog', "du_an")
 
-    def get(self):
-        """Danh sách các dự án hiện có
+    def get(self, current_page, limit):
+        """Danh sách các dự án hiện có (có phân trang)
+
+        Args:
+            current_page (str): thứ tự trang hiện tại
+            limit (str): giới hạn số đối tượng dữ liệu mỗi trang
 
         Returns:
-            JSON: tập danh sách các dự án
+            _type_: _description_
         """
-        json_data = [doc for doc in self.du_an_collection.find()]
-        json_data = json.dumps(json_data, default=str,
-                               ensure_ascii=False, indent=4)
+        try:
+            current_page = int(current_page)
+            limit = int(limit)
+            # Số đối tượng dữ liệu bị bỏ qua mỗi trang [page: 1, skip: 0, page: 2, skip:2-1 * limit]
+            skip = int((current_page - 1) * limit)
+            limited_projects = list(
+                self.du_an_collection.find().skip(skip).limit(limit))
+            # Đếm tổng dòng dữ liệu dự án hiện có trong DB
+            total_projects = self.du_an_collection.count_documents({})
+            # Tính số trang cần phân để phù hợp với tổng dòng dữ liệu hiện có
+            total_pages = (total_projects // limit) + \
+                (1 if total_projects % limit > 0 else 0)
+            # Trả về dữ liệu danh sách dự án đã được phân theo trang
+            output_data = {
+                'limited_projects': limited_projects,
+                'total_pages': total_pages,
+                'current_page': current_page
+            }
+            return json.dumps(output_data, default=str, indent=4, ensure_ascii=False), 200
+
+        except Exception as e:
+            logging.error(
+                f"Error in my_blog.DuAn: {str(e)}", exc_info=True)
+            return system_error()
+
         return json_data
 
     def update_viewer(self, oid):
@@ -50,6 +77,8 @@ class DuAn():
             logging.error(
                 f"Error in my_blog.DuAn: {str(e)}", exc_info=True)
             return system_error()
+
+
 class TienIch():
     def __init__(self):
         self.tien_ich_collection = connect('my_blog', "tien_ich")
@@ -60,10 +89,9 @@ class TienIch():
         Returns:
             JSON: danh sách các tiện ích
         """
-        json_data = [doc for doc in self.tien_ich_collection.find()]
-        json_data = json.dumps(json_data, default=str,
-                               ensure_ascii=False, indent=4)
-        return json_data
+        tools = list(self.tien_ich_collection.find())
+        return json.dumps(tools, default=str,
+                          ensure_ascii=False, indent=4)
 
 
 class PersonalInfo():

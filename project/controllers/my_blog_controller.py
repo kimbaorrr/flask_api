@@ -5,7 +5,9 @@ from project.models.my_blog import *
 # Dự án
 @app.route('/my_blog/du_an/get', methods=['GET'])
 def blog_get_du_an():
-    return DuAn().get()
+    current_page = request.args.get('current_page')
+    limit = request.args.get('limit')
+    return DuAn().get(current_page, limit)
 
 
 @app.route('/my_blog/du_an/update_viewer', methods=['POST'])
